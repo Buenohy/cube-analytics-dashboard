@@ -14,7 +14,7 @@ export default function Home() {
             Cube Uniswap V3 Explorer
           </h1>
           <p className="text-slate-400 ml-1">
-            Monitoramento de liquidez e volume em tempo real via The Graph.
+            Real-time liquidity and volume monitoring via The Graph.
           </p>
         </header>
 

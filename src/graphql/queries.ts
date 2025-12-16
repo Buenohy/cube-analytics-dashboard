@@ -4,7 +4,12 @@ import { gql } from '@apollo/client';
 // 1. Apenas os dados básicos da Pool (sem o histórico aninhado)
 export const GET_TOP_POOLS = gql`
   query GetTopPools {
-    pools(first: 10, orderBy: totalValueLockedUSD, orderDirection: desc) {
+    pools(
+      first: 10
+      orderBy: totalValueLockedUSD
+      orderDirection: desc
+      where: { volumeUSD_gt: "10000", txCount_gt: "100" }
+    ) {
       id
       feeTier
       totalValueLockedUSD

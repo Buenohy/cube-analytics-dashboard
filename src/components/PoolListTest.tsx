@@ -35,79 +35,99 @@ export default async function PoolList() {
   const allHistory: PoolDayData[] = historyData.poolDayDatas;
 
   return (
-    <div className="w-full overflow-x-auto bg-[#0d0e12] p-4 rounded-xl border border-slate-800">
-      <table className="w-full text-left border-collapse">
-        <thead>
-          <tr className="text-slate-400 text-xs border-b border-slate-800">
-            <th className="py-4 pl-4 font-normal">#</th>
-            <th className="py-4 font-normal">Pool</th>
-            <th className="py-4 font-normal">Protocol</th>
-            <th className="py-4 font-normal">TVL</th>
-            <th className="py-4 font-normal">Pool APR</th>
-            <th className="py-4 font-normal">1D vol</th>
-            <th className="py-4 font-normal">30D vol</th>
-            <th className="py-4 pr-4 font-normal text-right">Vol/TVL</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pools.map((pool, index) => {
-            const poolHistory = allHistory.filter(
-              (day) => day.pool.id === pool.id
-            );
-            const tvl = parseFloat(pool.totalValueLockedUSD);
-            const vol1d = parseFloat(poolHistory[0]?.volumeUSD || '0');
-            const vol30d = poolHistory.reduce(
-              (acc, day) => acc + parseFloat(day.volumeUSD),
-              0
-            );
-            const apr = calculateAPR(vol1d, pool.feeTier, tvl);
-            const volTvlRatio = tvl > 0 ? vol1d / tvl : 0;
-            const feeTierPercent = parseFloat(pool.feeTier) / 10000;
+    <div className="w-full bg-[#0d0e12] rounded-2xl border border-white/5 overflow-hidden">
+      <div className="overflow-x-auto no-scrollbar relative">
+        <table className="w-full border-collapse min-w-190">
+          <thead>
+            <tr className="text-gray-500 text-xs font-medium border-b border-white/5">
+              <th className="h-10 pl-4 w-10 sticky left-0 z-30 bg-[#0d0e12] text-left">
+                #
+              </th>
 
-            const imgUrl = (address: string) =>
-              `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`;
+              <th className="h-10 sticky left-10 z-30 bg-[#0d0e12] pr-8 text-left shadow-[10px_0_20px_-5px_rgba(0,0,0,0.8)] clip-path-inset">
+                Pool
+              </th>
 
-            return (
-              <tr
-                key={pool.id}
-                className="hover:bg-slate-800/40 transition-colors text-sm border-b border-slate-900/50 last:border-0"
-              >
-                <td className="py-4 pl-4 text-slate-400">{index + 1}</td>
+              <th className="h-10 px-4 text-right">TVL</th>
+              <th className="h-10 px-4 text-right">APR</th>
+              <th className="h-10 px-4 text-right">1D Vol</th>
+              <th className="h-10 px-4 text-right">30D Vol</th>
+              <th className="h-10 px-4 pr-6 text-right">Vol/TVL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pools.map((pool, index) => {
+              const poolHistory = allHistory.filter(
+                (day) => day.pool.id === pool.id
+              );
+              const tvl = parseFloat(pool.totalValueLockedUSD);
+              const vol1d = parseFloat(poolHistory[0]?.volumeUSD || '0');
+              const vol30d = poolHistory.reduce(
+                (acc, day) => acc + parseFloat(day.volumeUSD),
+                0
+              );
+              const apr = calculateAPR(vol1d, pool.feeTier, tvl);
+              const volTvlRatio = tvl > 0 ? vol1d / tvl : 0;
+              const feeTierPercent = parseFloat(pool.feeTier) / 10000;
 
-                <td className="py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex -space-x-2">
-                      <TokenIcon
-                        src={imgUrl(pool.token0.id)}
-                        alt={pool.token0.symbol}
-                      />
-                      <TokenIcon
-                        src={imgUrl(pool.token1.id)}
-                        alt={pool.token1.symbol}
-                      />
+              return (
+                <tr
+                  key={pool.id}
+                  className="group hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 h-18"
+                >
+                  <td className="sticky left-0 z-20 bg-[#0d0e12] group-hover:bg-[#13141b] pl-4 text-gray-500 text-sm font-medium">
+                    {index + 1}
+                  </td>
+
+                  <td className="sticky left-10 z-20 bg-[#0d0e12] group-hover:bg-[#13141b] pr-8 shadow-[10px_0_20px_-5px_rgba(0,0,0,0.8)]">
+                    <div className="flex items-center">
+                      <div className="relative flex items-center mr-3 w-[42px]">
+                        <div className="z-10 relative">
+                          <TokenIcon
+                            address={pool.token0.id}
+                            alt={pool.token0.symbol}
+                          />
+                        </div>
+                        <div className="-ml-3 z-0 relative opacity-90">
+                          <TokenIcon
+                            address={pool.token1.id}
+                            alt={pool.token1.symbol}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col justify-center">
+                        <span className="text-white font-semibold text-[15px] leading-tight">
+                          {pool.token0.symbol}/{pool.token1.symbol}
+                        </span>
+                        <span className="bg-[#1b1e29] text-gray-400 text-[10px] px-1.5 py-0.5 rounded-[6px] w-fit mt-1 font-medium">
+                          {feeTierPercent}%
+                        </span>
+                      </div>
                     </div>
-                    <span className="font-semibold text-white">
-                      {pool.token0.symbol}/{pool.token1.symbol}
-                    </span>
-                    <span className="bg-slate-800 text-slate-400 text-[10px] px-1.5 py-0.5 rounded">
-                      {feeTierPercent}%
-                    </span>
-                  </div>
-                </td>
+                  </td>
 
-                <td className="py-4 text-slate-400">v3</td>
-                <td className="py-4 text-white">{formatCompact(tvl)}</td>
-                <td className="py-4 text-green-400">{formatPercent(apr)}</td>
-                <td className="py-4 text-white">{formatCompact(vol1d)}</td>
-                <td className="py-4 text-white">{formatCompact(vol30d)}</td>
-                <td className="py-4 pr-4 text-right text-white">
-                  {volTvlRatio < 0.01 ? '<0.01' : volTvlRatio.toFixed(2)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                  <td className="px-4 text-white font-medium text-right whitespace-nowrap">
+                    {formatCompact(tvl)}
+                  </td>
+                  <td className="px-4 text-[#27e3ab] font-medium text-right whitespace-nowrap">
+                    {formatPercent(apr)}
+                  </td>
+                  <td className="px-4 text-white text-right whitespace-nowrap">
+                    {formatCompact(vol1d)}
+                  </td>
+                  <td className="px-4 text-gray-400 text-right whitespace-nowrap">
+                    {formatCompact(vol30d)}
+                  </td>
+                  <td className="px-4 pr-6 text-gray-400 text-right whitespace-nowrap">
+                    {volTvlRatio < 0.01 ? '<0.01' : volTvlRatio.toFixed(2)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
