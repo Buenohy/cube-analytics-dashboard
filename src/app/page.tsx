@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import PoolListTest from '@/components/PoolListTest';
+import PoolList from '@/components/PoolList';
 import { Coins } from 'lucide-react';
 
 export default function Home() {
@@ -20,7 +20,7 @@ export default function Home() {
 
         <section>
           <Suspense fallback={<LoadingState />}>
-            <PoolListTest />
+            <PoolList />
           </Suspense>
         </section>
       </div>
